@@ -158,4 +158,155 @@ react-Intl ile çalışmaya başlamamız dereken ihiyaçlar bunlar idi.
 öncelikle <IntlProvider /> ı en dışa koyacağız sonrada içerisine kullanmak istediğiniz her hangibir yazıdır, paragraftır neyse arttık 
 onuda <FormattedMessage  /> componentine id olarak verdiğinizde kullanmaya başlaya bilirsiniz
 
+-_-_-_-_-_-_-_-_-_ Default Locale -_-_-_-_-_-_-_-_-_
+
+web sayfamızı ilk açtığımızda bizi varsayılan dil karşılıyor. biz tr belirlediğimiz için tr başlatılıyor. oysa kullandığımız browserın dili ne ise onunla açılmalı idi.şimdi bunu düzeltelim.Ayrıca en kısmına geçtikten sonra sayfayı yenilediğimde tekrar tr oluyor.bu iki problemi düzeltelim. kaynak koduma geliyorum öncelikle browserın dilini öğrenmem lazım <const defaultLocale = navigator.language;> tanımın kullanabilirim şimdi bunu console.log(defaultLocale); diyerek kontrol edelim.
+
+## ![](localization/foto/localization6.jpg)
+
+en-US şeklinde verdi. fakat burada bir uyarı var.locale tanımı yapılmamış bunu <<IntlProvider messages={messages[lang]}>>buraya yapalım ve hata kodlarımızı aşağıdaki gibi düzeltelim
+
+## App.js
+import "./App.css";
+
+import { IntlProvider, FormattedMessage, FormattedNumber } from "react-intl";
+import { useState } from "react";
+
+const messages = {
+  "tr-TR": {
+    title: "merhaba dünya",
+    description: " 3 yeni mesajınız var...",
+  },
+  "en-US": {
+    title: "hello world",
+    description: " you have 3 new messages...",
+  },
+};
+function App() {
+  const defaultLocale = navigator.language;
+  const [locale, setLocale] = useState("tr-TR");
+
+  console.log(defaultLocale);
+
+  return (
+    <div className="App">
+      <IntlProvider locale={locale} messages={messages[locale]}>
+        <FormattedMessage id="title" />
+        <p>
+          {" "}
+          <FormattedMessage id="description" />
+        </p>
+      </IntlProvider>
+      <br />
+      <br />
+      <button onClick={() => setLocale("tr-TR")}>TR</button>
+      <button onClick={() => setLocale("en-US")}>EN</button>
+    </div>
+  );
+}
+
+export default App;
+## ![](localization/foto/localization7.jpg)
+
+ekranda görüldüğü gibi varsayılan türkçe ama browserın dili ingilizce.
+
+<const defaultLocale = navigator.language;>  <defaultLocale> değişkenimi  statetime koyarsam durum düzelecektir <const [locale, setLocale] = useState(defaultLocale);> 
+
+## App.js
+
+import "./App.css";
+
+import { IntlProvider, FormattedMessage, FormattedNumber } from "react-intl";
+import { useState } from "react";
+
+const messages = {
+  "tr-TR": {
+    title: "merhaba dünya",
+    description: " 3 yeni mesajınız var...",
+  },
+  "en-US": {
+    title: "hello world",
+    description: " you have 3 new messages...",
+  },
+};
+function App() {
+  const defaultLocale = navigator.language;
+  const [locale, setLocale] = useState(defaultLocale);
+
+  console.log(defaultLocale);
+
+  return (
+    <div className="App">
+      <IntlProvider locale={locale} messages={messages[locale]}>
+        <FormattedMessage id="title" />
+        <p>
+          {" "}
+          <FormattedMessage id="description" />
+        </p>
+      </IntlProvider>
+      <br />
+      <br />
+      <button onClick={() => setLocale("tr-TR")}>TR</button>
+      <button onClick={() => setLocale("en-US")}>EN</button>
+    </div>
+  );
+}
+
+export default App;
+
+## ![](localization/foto/localization8.jpg)
+
+şu anda dili türkçe seçip refresh yaparsam tekrar ingilizce oluyor.çünkü default yani browserın dili ingilizce olduğu için ingilizce açılıyor.halbuki en son tercih hangisi ise onunla açılmasını istiyorum. o yüzdende şöyle birşey yapacağız. bir dil değişimi olduğunda bunu local store e yazacağız.ve sonraki kullanımlardada local store de de eğer bir dil tanımı varsa oradan kullanmasını zorlayacağız yoksada navigator altındaki nesneyi kullanmaya çalışacağız.
+   oyüzden ben burada useEffect ile dil değiştiği anda bu dili useEffect kullanarak local store ime yazarsam varsayılan olarak orada kullanabilirim.böylelikle problem çözülecektir.locale değiştiği anda localStorage.SetItem locale key ine lokale statetini veriyorum isLocale değişkenini tanımlıyor aşağıda terniry ile kodu düzenliyorum.
+
+   ## App.js
+
+   import "./App.css";
+
+import { IntlProvider, FormattedMessage, FormattedNumber } from "react-intl";
+import { useState, useEffect } from "react";
+
+const messages = {
+  "tr-TR": {
+    title: "merhaba dünya",
+    description: " 3 yeni mesajınız var...",
+  },
+  "en-US": {
+    title: "hello world",
+    description: " you have 3 new messages...",
+  },
+};
+function App() {
+  const isLocale = localStorage.getItem("locale");
+  const defaultLocale = isLocale ? isLocale : navigator.language;
+  const [locale, setLocale] = useState(defaultLocale);
+
+  useEffect(() => {
+    localStorage.setItem("locale", locale);
+  }, [locale]);
+
+  console.log(defaultLocale);
+
+  return (
+    <div className="App">
+      <IntlProvider locale={locale} messages={messages[locale]}>
+        <FormattedMessage id="title" />
+        <p>
+          {" "}
+          <FormattedMessage id="description" />
+        </p>
+      </IntlProvider>
+      <br />
+      <br />
+      <button onClick={() => setLocale("tr-TR")}>TR</button>
+      <button onClick={() => setLocale("en-US")}>EN</button>
+    </div>
+  );
+}
+
+export default App;
+
+
+
+
 
