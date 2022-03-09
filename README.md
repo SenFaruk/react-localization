@@ -306,6 +306,64 @@ function App() {
 
 export default App;
 
+-_-_-_-_-_-_-_-_-_ parametre geçmek -_-_-_-_-_-_-_-_-_
+
+burada nasıl bir parametre datası geçebiliriz. bunu öğreneceğiz
+
+description key in deki 3 rakamı şu anda sabit bizim bunu bir parametre ile göndermemiz gerekir.
+
+<<FormattedMessage id="description" />> buna bir data geçmemiz mümkün
+values dedikten örneğin buraya bir count verip descriptionda kullanlım.
+
+## App.js
+
+import "./App.css";
+
+import { IntlProvider, FormattedMessage, FormattedNumber } from "react-intl";
+import { useState, useEffect } from "react";
+
+const messages = {
+  "tr-TR": {
+    title: "merhaba dünya",
+    description: " {count} yeni mesajınız var...",
+  },
+  "en-US": {
+    title: "hello world",
+    description: " you have {count} new messages...",
+  },
+};
+function App() {
+  const isLocale = localStorage.getItem("locale");
+  const defaultLocale = isLocale ? isLocale : navigator.language;
+  const [locale, setLocale] = useState(defaultLocale);
+
+  useEffect(() => {
+    localStorage.setItem("locale", locale);
+  }, [locale]);
+
+  console.log(defaultLocale);
+
+  return (
+    <div className="App">
+      <IntlProvider locale={locale} messages={messages[locale]}>
+        <FormattedMessage id="title" />
+        <p>
+          {" "}
+          <FormattedMessage id="description" values={{ count: 44 }} />
+        </p>
+      </IntlProvider>
+      <br />
+      <br />
+      <button onClick={() => setLocale("tr-TR")}>TR</button>
+      <button onClick={() => setLocale("en-US")}>EN</button>
+    </div>
+  );
+}
+
+export default App;
+
+
+
 
 
 
